@@ -90,7 +90,7 @@ void *connection_handler(void *socket_desc)
     //Get the socket descriptor
     int sock = *(int*)socket_desc;
     int read_size;
-    char client_message[2000];
+    char client_message[BUFSIZ];
      
     //Send some messages to the client
     char message[BUFSIZ] = "Greetings! I am your connection handler\n";
@@ -100,7 +100,7 @@ void *connection_handler(void *socket_desc)
     write(sock , message , strlen(message));
      
     //Receive a message from client
-    while( (read_size = recv(sock , client_message , 2000 , 0)) > 0 )
+    while( (read_size = recv(sock , client_message , sizeof(client_message) , 0)) > 0 )
     {
         //end of string marker
         client_message[read_size] = '\0';

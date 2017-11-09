@@ -87,7 +87,7 @@ int main(int argc , char *argv[])
     }
      
     //Now join the thread , so that we dont terminate before the thread
-    //pthread_join( thread_id , NULL);
+    pthread_join( thread_id , NULL);
     puts("Handler assigned");
      
     if (s < 0)
