@@ -17,9 +17,12 @@ void *connection_handler(void *);
  
 int main(int argc , char *argv[])
 {
-    int socket_desc , client_sock , c;
+    int socket_desc , client_sock , c, server_port;
     struct sockaddr_in server , client;
-     
+    if (argc == 2){
+        server_port = atoi(argv[1]);
+
+    } 
     //Create socket
     socket_desc = socket(AF_INET , SOCK_STREAM , 0);
     if (socket_desc == -1)
@@ -31,7 +34,7 @@ int main(int argc , char *argv[])
     //Prepare the sockaddr_in structure
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons( 41040 );
+    server.sin_port = htons( server_port );
      
     //Bind
     if( bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0)
