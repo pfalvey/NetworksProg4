@@ -100,21 +100,14 @@ int main(int argc , char *argv[])
 
 
     bzero(buf, sizeof(buf));
-    //read stdin and send to server
-    while(fgets(buf, sizeof(buf), stdin))
+
+    while(!quit)
     {
-      write(s, buf, strlen(buf));
+        command_menu(s);
     }
-     
     //Now join the thread , so that we dont terminate before the thread
-    //pthread_join( handler_thread , NULL);
+    pthread_join( handler_thread , NULL);
     //puts("Handler assigned");
-     
-    if (s < 0)
-    {
-        perror("accept failed");
-        return 1;
-    }
      
     return 0;
 }
@@ -180,59 +173,28 @@ void check_password(void *socket_desc)
     
 void *handle_messages(void *socket_desc) {
     //Receive a message from server
-    //put it onto queue for parsing
-  char buf[BUFSIZ];
-  int sock = *(int*)socket_desc;
-  int read_size;
+    char buf[BUFSIZ];
+    int sock = *(int*)socket_desc;
+    int r;
 
-  while(1)
-  {
-      if(quit)
-      {
-	  break;
-      }
+    while(1)
+    {
+        if(quit)
+        {
+  	    break;
+        }
   
+	bzero(buf, sizeof(buf));
 
-      if(read_size = recv(sock, buf, sizeof(buf), 0) <= 0)
+	if(r = recv(sock, buf, sizeof(buf), 0) <= 0)
 	{
 	  perror("Error receiving message from server\n");
 	  exit(1);
 	}
 
-      std::cout << buf << std::endl;
-      //for now we just print the message, later we may have to parse it
-  }
+	printMessage(buf);
+    }
   
-/*
-    while( fgets(buf, sizeof(buf), stdin))
-    {
-        buf[strlen(buf)] = '\0';
-        
-        //Send the message to server
-        write(sock , buf , strlen(buf));
-        memset(buf, 0, sizeof(buf));
-        //read message from server
-        if (read_size = recv(sock , buf, sizeof(buf) , 0) == -1){
-            perror("Error receiving message from server\n");
-            exit(1);
-        }
-        std::cout<<buf<<std::endl;
-        //clear the message buffer
-        memset(buf, 0, sizeof(buf));
-    }
-     
-    if(read_size == 0)
-    {
-        puts("Client disconnected");
-        fflush(stdout);
-    }
-    else if(read_size == -1)
-    {
-        perror("recv failed");
-    }
-         
-    return 0;
-  */
 } 
 
 void commandMenu(int sock) {
@@ -250,7 +212,8 @@ void commandMenu(int sock) {
             broadcastMessage(sock);
             break;
         } else if (command.compare("E") == 0) {
-            break;
+	    quit = 1;
+	    break;
         } else {
             std::cout << "Please enter one of the options\n";
         }
@@ -337,5 +300,5 @@ void broadcastMessage(int sock) {
 void printMessage(char * msg) {
     msg++;
     std::string message = msg;
-    std::cout << msg;
+    std::cout << message;
 }
