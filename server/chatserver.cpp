@@ -248,11 +248,20 @@ void privateMessage(int sock) {
 
 void broadcastMessage(int sock) {
     // Send acknowledgement to server
-     
+    std::string conf = "CONF";
+    write(sock, conf.c_str(), strlen(conf.c_str()));
+    char buffer[BUFSIZ];
     // Receive Message, add formatting
-    
+    if (recv(sock , buffer , sizeof(buffer) , 0) <= 0){
+        perror("Error receiving message from client\n");
+        exit(1);
+    }
     // Send message to all users
-
+    std::string bufferTemp = buffer;
+    std::string message = "#### New Message: " + bufferTemp + " ####";
+    for (auto it = clients.begin(); it!= clients.end(); ++it){
+        write(it->second, message.c_str(), strlen(message.c_str()));   
+    }
 }
 
 void clientExit(int sock) {
