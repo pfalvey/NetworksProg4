@@ -23,7 +23,7 @@
 #include <algorithm>
 #include <sstream>
 
-void commandMenu(int);
+int commandMenu(int);
 void privateMessage(int);
 void broadcastMessage(int);
 void clientExit(int);
@@ -236,25 +236,26 @@ void *handle_messages(void *socket_desc) {
   */
 } 
 
-void commandMenu(int sock) {
+int commandMenu(int sock) {
     // Display Options and Read Input
-    std::cout << "Enter P for private conversation\nEnter B for message broadcasting\nEnter E for Exit\n\n  >> ";
+    std::cout << "Enter P for private conversation\nEnter B for message broadcasting\nEnter E for Exit\n\n";
     std::string command;
-    std::cin >> command;
 
     // Enter Operation Function
     while (1) {
+        std::cout << "  >> ";
+        std::cin >> command;
         if (command.compare("P") == 0) {
             privateMessage(sock);
-            break;
+            return 0;
         } else if (command.compare("B") == 0) {
             broadcastMessage(sock);
-            break;
+            return 0;
         } else if (command.compare("E") == 0) {
             clientExit(sock);
-            return;
+            return 1;
         } else {
-            std::cout << "Please enter one of the options\n";
+            std::cout << "\nPlease enter one of the options\n";
         }
     }
 

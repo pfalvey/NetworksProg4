@@ -19,7 +19,7 @@
 
 void privateMessage(int);
 void broadcastMessage(int);
-void clientExit(int);
+void clientExit(int, std::string);
  
 //the thread function
 void *connection_handler(void *);
@@ -251,6 +251,7 @@ void broadcastMessage(int sock) {
 
 }
 
-void clientExit(int sock) {
-
+void clientExit(int sock, std::string username) {
+    std::cout << "Client disconnected";
+    clients.erase(username);
 }
