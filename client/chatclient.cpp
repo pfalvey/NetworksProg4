@@ -26,7 +26,7 @@
 void commandMenu(int);
 void privateMessage(int);
 void broadcastMessage(int);
-void printMessage(int);
+void printMessage(char*);
 
 //the thread function
 void *handle_messages(void*);
@@ -98,12 +98,11 @@ int main(int argc , char *argv[])
         return 1;
     }
 
-
     bzero(buf, sizeof(buf));
 
     while(!quit)
     {
-        command_menu(s);
+        commandMenu(s);
     }
     //Now join the thread , so that we dont terminate before the thread
     pthread_join( handler_thread , NULL);
