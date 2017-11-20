@@ -1,18 +1,16 @@
 # NetworksProg4
 
+Patrick Falvey, Matt Flanagan, Michael Farren
+
 Files:
 ======
-client Directory:
 chatclient				Executable for the client program
 chatclient.cpp				C++ code that runs the client
-Makefile				Makefile to compile the chatclient.cpp code
-
+Makefile (client directory)		Makefile to compile the chatclient.cpp code
 README.md				This document listing the files included in our assignment
-
-server Directory:
 chatserver				Executable for the server program
 chatserver.cpp				C++ code that runs the server
-Makefile				Makefile to compile the chatserver.cpp code
+Makefile (server directory)		Makefile to compile the chatserver.cpp code
 passwords.txt				Text file of returning users and their passwords
 
 
