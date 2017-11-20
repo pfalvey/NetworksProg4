@@ -11,12 +11,41 @@
 #include<arpa/inet.h> //inet_addr
 #include<unistd.h>    //write
 #include<pthread.h> //for threading , link with lpthread
+#include<fstream>   //reading files
+#include<sstream>   //parsing strings for passwords
+#include<map>       
+#include<string>
+#include<iostream>
  
 //the thread function
 void *connection_handler(void *);
+bool passwordsExist = false; //is true if a passwords.txt file already exists
+std::map<std::string, std::string> passes; //map with username as key, password as value
  
 int main(int argc , char *argv[])
-{
+{   
+    /*   read in the passwords file   */
+    std::fstream ifs;
+    std::string filename = "passwords.txt";
+    ifs.open(filename);
+    if(ifs) {    //passwords.txt exists
+        passwordsExist = true;
+        std::string temp;
+        while (!ifs.eof()){
+            getline(ifs, temp);
+            std::stringstream ss;
+            ss << temp;
+            std::string user, pass;
+            ss >> user >> pass;
+            if (user.length() > 0 && pass.length() > 0)
+                passes.insert(std::pair<std::string, std::string>(user, pass));
+        }
+    }
+    /*for (auto it=passes.begin(); it!=passes.end(); ++it){
+        std::cout<<it->first <<" "<<it->second<<std::endl;
+    }*/
+
+
     int socket_desc , client_sock , c, server_port;
     struct sockaddr_in server , client;
     if (argc == 2){
