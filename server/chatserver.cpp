@@ -201,9 +201,10 @@ void *connection_handler(void *socket_desc)
     while( (read_size = recv(sock , client_message , sizeof(client_message) , 0)) > 0 )
     {
         std::string mes = client_message;
+        std::cout<<"*"<<mes<<"*\n";
         if (mes.compare("CP") == 0)
             privateMessage(sock);
-        else if (mes.compare("BP") == 0)
+        else if (mes.compare("CB") == 0)
             broadcastMessage(sock);
         else if (mes.compare("E") == 0)
             clientExit(sock);
