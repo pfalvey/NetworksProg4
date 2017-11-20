@@ -26,7 +26,7 @@
 void commandMenu(int);
 void privateMessage(int);
 void broadcastMessage(int);
-void printMessage(int);
+void printMessage(char *);
 
 //the thread function
 void *handle_messages(void*);
