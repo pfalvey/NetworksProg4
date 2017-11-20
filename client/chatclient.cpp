@@ -94,7 +94,7 @@ int main(int argc , char *argv[])
     puts("Connected to server\n");
     //connection to server established, handle username/password
     check_password(&s);
-         
+
     if( pthread_create( &handler_thread , NULL , handle_messages , (void*) &s) < 0)
     {
         perror("could not create thread");
@@ -102,7 +102,6 @@ int main(int argc , char *argv[])
     }
 
     bzero(buf, sizeof(buf));
-
     while(!quit)
     {
         commandMenu(s);
@@ -171,8 +170,8 @@ void check_password(void *socket_desc)
         check = "";
         repoTemp << buf;
         repoTemp >> check;
-
     }
+    memset(buf, 0, sizeof(buf));
 }
 
     
@@ -189,7 +188,7 @@ void *handle_messages(void *socket_desc) {
   	    break;
         }
   
-	bzero(buf, sizeof(buf));
+    memset(buf, 0, sizeof(buf));
 
 	if(r = recv(sock, buf, sizeof(buf), 0) <= 0)
 	{
@@ -259,8 +258,7 @@ void privateMessage(int sock) {
     getline(std::cin.ignore(), message);
 
     // send username
-    write(sock, username.c_str(), strlen(username.c_str()));
-
+    int temp = write(sock, username.c_str(), strlen(username.c_str()));
     // send message
     write(sock, message.c_str(), strlen(message.c_str()));
     sleep(1);

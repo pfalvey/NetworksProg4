@@ -130,6 +130,7 @@ void *connection_handler(void *socket_desc)
         perror("error retrieving username from client\n");
     } 
     std::string tempUsername = buf;
+    memset(buf, 0, BUFSIZ);
     //tempUsername.pop_back();
     bool existingUser = false;
     for (auto it=passes.begin(); it!=passes.end(); ++it){
@@ -166,6 +167,7 @@ void *connection_handler(void *socket_desc)
             perror("error retrieving username from client\n");
         }
         std::string tempPass = buf;
+        memset(buf, 0, BUFSIZ);
 
         /* write new password to file */
         if (passwordsExist){
@@ -187,7 +189,7 @@ void *connection_handler(void *socket_desc)
     std::string welcomeMessage = "Welcome " + tempUsername + "!\n";
     write(sock , welcomeMessage.c_str() , strlen(welcomeMessage.c_str()));
     clients.insert(std::pair<std::string, int>(tempUsername, sock));
-     
+    memset(client_message, 0, BUFSIZ);
     //Receive a message from client
     while( (read_size = recv(sock , client_message , sizeof(client_message) , 0)) > 0 )
     {
@@ -198,6 +200,7 @@ void *connection_handler(void *socket_desc)
             broadcastMessage(sock);
         else if (mes.compare("CE") == 0)
             clientExit(sock, tempUsername);
+        memset(client_message, 0, BUFSIZ);
     }
      
     if(read_size == 0)
