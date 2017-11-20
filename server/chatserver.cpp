@@ -52,7 +52,12 @@ int main(int argc , char *argv[])
     if (argc == 2){
         server_port = atoi(argv[1]);
 
-    } 
+    }
+    else
+    {
+      std::cout << "Usage:" << std::endl << "\t./chatserver <port number>" << std::endl;
+      exit(1);
+    }
     //Create socket
     socket_desc = socket(AF_INET , SOCK_STREAM , 0);
     if (socket_desc == -1)
