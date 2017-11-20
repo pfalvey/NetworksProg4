@@ -205,7 +205,7 @@ void *connection_handler(void *socket_desc)
             privateMessage(sock);
         else if (mes.compare("CB") == 0)
             broadcastMessage(sock);
-        else if (mes.compare("E") == 0)
+        else if (mes.compare("CE") == 0)
             clientExit(sock, tempUsername);
 
     }
@@ -271,6 +271,7 @@ void broadcastMessage(int sock) {
 }
 
 void clientExit(int sock, std::string username) {
-    std::cout << "Client disconnected";
+    std::string bye = "CONF";
+    write(sock, bye.c_str(), strlen(bye.c_str()));
     clients.erase(username);
 }

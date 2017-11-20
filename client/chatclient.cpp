@@ -166,7 +166,9 @@ void check_password(void *socket_desc)
         std::cout<<buf;
         std::stringstream repoTemp;
         check = "";
+        repoTemp << buf;
         repoTemp >> check;
+
     }
 }
 
@@ -206,8 +208,9 @@ void *handle_messages(void *socket_desc) {
 
 int commandMenu(int sock) {
     // Display Options and Read Input
-    std::cout << "Enter P for private conversation\nEnter B for message broadcasting\nEnter E for Exit\n\n";
+    std::cout << "Enter P for private conversation\nEnter B for message broadcasting\nEnter E for Exit\n\n >> ";
     std::string command;
+    std::cin >> command;
 
     // Enter Operation Function
     while (true) {
@@ -296,6 +299,7 @@ void clientExit(int sock) {
     char buf[BUFSIZ];
     memset(buf, 0, sizeof(buf));
     sprintf(buf, "CE");
+    write (sock, buf, strlen(buf));
     quit = 1;
 }
 
