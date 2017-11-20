@@ -50,10 +50,6 @@ int main(int argc , char *argv[])
                 passes.insert(std::pair<std::string, std::string>(user, pass));
         }
     }
-    /*for (auto it=passes.begin(); it!=passes.end(); ++it){
-        std::cout<<it->first <<" "<<it->second<<std::endl;
-    }*/
-
 
     int socket_desc , client_sock , c, server_port;
     struct sockaddr_in server , client;
@@ -72,7 +68,6 @@ int main(int argc , char *argv[])
     {
         printf("Could not create socket");
     }
-    puts("Socket created");
      
     //Prepare the sockaddr_in structure
     server.sin_family = AF_INET;
@@ -86,24 +81,20 @@ int main(int argc , char *argv[])
         perror("bind failed. Error");
         return 1;
     }
-    puts("bind done");
      
     //Listen
     listen(socket_desc , 3);
      
     //Accept and incoming connection
-    puts("Waiting for incoming connections...");
     c = sizeof(struct sockaddr_in);
      
      
     //Accept and incoming connection
-    puts("Waiting for incoming connections...");
     c = sizeof(struct sockaddr_in);
     pthread_t thread_id;
     
     while( (client_sock = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&c)) )
     {
-        puts("Connection accepted");
          
         if( pthread_create( &thread_id , NULL ,  connection_handler , (void*) &client_sock) < 0)
         {
@@ -113,7 +104,6 @@ int main(int argc , char *argv[])
          
         //Now join the thread , so that we dont terminate before the thread
         //pthread_join( thread_id , NULL);
-        puts("Handler assigned");
     }
      
     if (client_sock < 0)
@@ -211,7 +201,6 @@ void *connection_handler(void *socket_desc)
      
     if(read_size == 0)
     {
-        puts("Client disconnected");
         fflush(stdout);
         clients.erase(tempUsername);
     }
