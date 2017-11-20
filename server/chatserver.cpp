@@ -215,3 +215,35 @@ void *connection_handler(void *socket_desc)
          
     return 0;
 } 
+
+void privateMessage(int sock, std::map<std::string, int> users) {
+    // Create list of users as a string
+    std::string users_str = "Online Users:";
+    for (auto it = users.cbegin(); it != users.cend(); ++it) {
+        users_str += " -> " + it->first + "\n";
+    } 
+
+    // Convert string to char* & send to client
+
+    // Receive username
+    
+    // Check if user exists
+    
+    // Receive message, add formatting
+    
+    // Send message to correct user
+
+}
+
+void broadcastMessage(int sock, std::map<std::string, int> users) {
+    // Send acknowledgement to server
+    
+    // Receive Message, add formatting
+    
+    // Send message to all users
+
+}
+
+void clientExit(int sock) {
+
+}
