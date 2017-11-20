@@ -1,7 +1,8 @@
 /*
     C++ socket server example, handles multiple clients using threads
-    Compile
-    gcc server.c -lpthread -o server
+    Patrick Falvey
+    Mikey Farren
+    Matthew Flanagan
 */
  
 #include<stdio.h>

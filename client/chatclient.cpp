@@ -1,6 +1,8 @@
 /*
     C++ socket client, handles multiple clients using threads
-    Compile
+    Patrick Falvey
+    Mikey Farren
+    Matthew Flanagan
 */
  
 #include<arpa/inet.h> //inet_addr
@@ -152,6 +154,7 @@ void check_password(void *socket_desc)
     repo << response;
     std::string check;
     repo >> check;
+    /* ensures password is correct */
     while (check.compare("Welcome") != 0){ //wrong password
         fgets(buf, sizeof(buf), stdin);
         if (write(sock, buf, strlen(buf)) == -1){
