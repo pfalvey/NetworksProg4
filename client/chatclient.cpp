@@ -268,13 +268,6 @@ void privateMessage(int sock) {
     sprintf(operation, "CP");
     write(sock, operation, strlen(operation));
 
-    // Print online users (sent by server) and get username from user
-    /*char server_message[BUFSIZ];
-    memset(server_message, 0, sizeof(server_message));
-    int read_size = recv(sock, server_message, sizeof(server_message), 0);
-    server_message[read_size] = '\0';
-
-    printMessage(server_message);*/
     char username[BUFSIZ];
     memset(username, 0, sizeof(username));
     std::cout << "Enter Username >> ";
@@ -294,15 +287,6 @@ void privateMessage(int sock) {
     }
     write(sock, username_msg, strlen(username_msg));
 
-    // Server tells us if user exists or not
-    /*memset(server_message, 0, sizeof(server_message));
-    read_size = recv(sock, server_message, sizeof(server_message), 0);
-    server_message[read_size] = '\0';
-    if (strcmp(server_message, "CY") != 0) {  // exit function if user does not exist
-        std::cout << "Username not found!\n\n";
-        return;
-    }*/
-
     // Send message to server
     char message[BUFSIZ];
     memset(message, 0, sizeof(message));
@@ -320,7 +304,7 @@ void privateMessage(int sock) {
         }
     }
     write(sock, send_msg, strlen(send_msg));
-    std::cout << "Message Send.\n";
+    std::cout << "Message Sent.\n";
 }
 
 void broadcastMessage(int sock) {
