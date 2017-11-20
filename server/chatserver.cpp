@@ -21,6 +21,7 @@
 void *connection_handler(void *);
 bool passwordsExist = false; //is true if a passwords.txt file already exists
 std::map<std::string, std::string> passes; //map with username as key, password as value
+std::map<std::string, int> clients; //map with username and sockets
  
 int main(int argc , char *argv[])
 {   
@@ -181,7 +182,7 @@ void *connection_handler(void *socket_desc)
     //Send some messages to the client
     std::string welcomeMessage = "Welcome " + tempUsername + "!\n";
     write(sock , welcomeMessage.c_str() , strlen(welcomeMessage.c_str()));
-     
+    clients.insert(std::pair<std::string, int>(tempUsername, sock));
      
     //Receive a message from client
     while( (read_size = recv(sock , client_message , sizeof(client_message) , 0)) > 0 )
@@ -200,6 +201,7 @@ void *connection_handler(void *socket_desc)
     {
         puts("Client disconnected");
         fflush(stdout);
+        clients.erase(tempUsername);
     }
     else if(read_size == -1)
     {
