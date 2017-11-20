@@ -23,6 +23,11 @@
 #include <algorithm>
 #include <sstream>
 
+void commandMenu(int);
+void privateMessage(int);
+void broadcastMessage(int);
+void printMessage(int);
+
 //the thread function
 void *connection_handler(void *);
 char *username;
@@ -190,3 +195,62 @@ void *connection_handler(void *socket_desc)
          
     return 0;
 } 
+
+void commandMenu(int sock) {
+    // Display Options and Read Input
+    std::cout << "Enter P for private conversation\nEnter B for message broadcasting\nEnter E for Exit\n\n  >> ";
+    std::string command;
+    std::cin >> command;
+
+    // Enter Operation Function
+    while (1) {
+        if (command.compare("P") == 0) {
+            privateMessage(sock);
+            break;
+        } else if (command.compare("B") == 0) {
+            broadcastMessage(sock);
+            break;
+        } else if (command.compare("E") == 0) {
+            break;
+        } else {
+            std::cout << "Please enter one of the options\n";
+        }
+    }
+
+}
+
+void privateMessage(int sock) {
+    // Send operation to server
+    char operation[BUFSIZ];
+    sprintf(operation, "CP");
+    write(sock, operation, strlen(operation));
+
+    // Server sends online users
+
+    // Send username
+    
+    // Server tells us if user exists or not
+    
+    // Send message to server
+
+}
+
+void broadcastMessage(int sock) {
+    // Send operation to server
+    char operation[BUFSIZ];
+    sprintf(operation, "BP");
+    write(sock, operation, strlen(operation));
+
+    // Receive Acknowledgement from server
+    
+    // Ask user for message
+    
+    // Send message
+
+}
+
+void printMessage(char * msg) {
+    msg++;
+    std::string message = msg;
+    std::cout << msg;
+}
