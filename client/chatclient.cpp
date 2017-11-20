@@ -193,7 +193,8 @@ void *handle_messages(void *socket_desc) {
 	}
 
       if (strcmp(buf, "CONF") != 0){  
-        std::cout << std::endl << buf <<"\n\n  >> ";
+        std::cout << std::endl << std::endl << buf <<std::endl;
+        std::cout << "\nEnter P for private conversation\nEnter B for message broadcasting\nEnter E for Exit\n\n  >> ";
         fflush(stdout);
       }
       //for now we just print the message, later we may have to parse it
@@ -209,7 +210,7 @@ int commandMenu(int sock) {
     std::string command;
 
     // Enter Operation Function
-    while (command.compare("E") != 0) {
+    while (true) {
         if (command.compare("P") == 0) {
             privateMessage(sock);
         } else if (command.compare("B") == 0) {
