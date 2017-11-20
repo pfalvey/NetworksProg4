@@ -17,9 +17,9 @@
 #include<string>
 #include<iostream>
 
-void privateMessage(int);
+void privateMessage(int, std::string);
 void broadcastMessage(int);
-void clientExit(int, std::string);
+void clientExit(std::string);
  
 //the thread function
 void *connection_handler(void *);
@@ -203,11 +203,11 @@ void *connection_handler(void *socket_desc)
         std::string mes = client_message;
         std::cout<<"*"<<mes<<"*\n";
         if (mes.compare("CP") == 0)
-            privateMessage(sock);
+            privateMessage(sock, tempUsername);
         else if (mes.compare("CB") == 0)
             broadcastMessage(sock);
         else if (mes.compare("E") == 0)
-            clientExit(sock);
+            clientExit(tempUsername);
 
     }
      
@@ -225,9 +225,9 @@ void *connection_handler(void *socket_desc)
     return 0;
 } 
 
-void privateMessage(int sock) {
+void privateMessage(int sock, std::string senderName) {
     // Create list of users as a string
-    std::string users_str = "Online Users:";
+    std::string users_str = "Online Users:\n";
     for (auto it = clients.begin(); it != clients.end(); ++it) {
         users_str += " -> " + it->first + "\n";
     } 
@@ -238,12 +238,33 @@ void privateMessage(int sock) {
     write(sock, users_buf, strlen(users_buf));
 
     // Receive username
-    
+    char buffer[BUFSIZ];
+    if (recv(sock, buffer, sizeof(buffer), 0) <= 0) {
+        perror("Error Receiving Message From Client\n");
+        exit(1);
+    }
+
     // Check if user exists
+    std::string username = buffer;
+    int priv_sock = 0;
+    for (auto it = clients.begin(); it != clients.end(); ++it) {
+        if (username.compare(it->first) == 0) { priv_sock = it->second; }
+    }
+    if (priv_sock == 0) {
+        std::string userErr = "User does not exist\n";
+        write(sock, userErr.c_str(), strlen(userErr.c_str()));
+        return;
+    }
     
-    // Receive message, add formatting
-    
-    // Send message to correct user
+    // Receive message, add formatting, send to user
+    memset(buffer, 0, BUFSIZ);
+    if (recv(sock, buffer, sizeof(buffer), 0) <= 0) {
+        perror("Error receiving message from client\n");
+        exit(1);
+    }
+    std::string bufferTemp = buffer;
+    std::string sendMsg = "#### New Message from " + senderName + ": " + bufferTemp + " ####";
+    write(priv_sock, sendMsg.c_str(), strlen(sendMsg.c_str()));
 
 }
 
@@ -265,7 +286,7 @@ void broadcastMessage(int sock) {
     }
 }
 
-void clientExit(int sock, std::string username) {
+void clientExit(std::string username) {
     std::cout << "Client disconnected";
     clients.erase(username);
 }

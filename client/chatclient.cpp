@@ -268,42 +268,23 @@ void privateMessage(int sock) {
     sprintf(operation, "CP");
     write(sock, operation, strlen(operation));
 
-    char username[BUFSIZ];
-    memset(username, 0, sizeof(username));
+    sleep(1);
     std::cout << "Enter Username >> ";
-    fgets(username, sizeof(username), stdin);
-
+    std::string username;
+    std::cin >> username;
+ 
     // Send username
-    char username_msg[BUFSIZ];
-    memset(username_msg, 0, sizeof(username_msg));
-    username_msg[0] = 'C';
-    for (int c = 0 ; c < strlen(username); c++) {
-        if (username[c] == '\n') {
-            username_msg[c+1] = '\0';
-            break;
-        } else {
-            username_msg[c+1] = username[c];
-        }
-    }
-    write(sock, username_msg, strlen(username_msg));
+    std::string username_msg = "C";
+    username_msg += username;
+    write(sock, username_msg.c_str(), strlen(username_msg.c_str()));
 
     // Send message to server
-    char message[BUFSIZ];
-    memset(message, 0, sizeof(message));
+    std::string message;
     std::cout << "Enter Private Message >> ";
-    fgets(message, sizeof(message), stdin);
+    getline(std::cin.ignore(), message);
 
-    char send_msg[BUFSIZ];
-    send_msg[0] = 'C';
-    for (int c = 0 ; c < strlen(message); c++) {
-        if (message[c] == '\n') {
-            send_msg[c+1] = '\0';
-            break;
-        } else {
-            send_msg[c+1] = message[c];
-        }
-    }
-    write(sock, send_msg, strlen(send_msg));
+    std::string send_msg = "C" + message;
+    write(sock, send_msg.c_str(), strlen(send_msg.c_str()));
     std::cout << "Message Sent.\n";
 }
 
