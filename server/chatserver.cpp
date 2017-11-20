@@ -26,6 +26,10 @@ void *connection_handler(void *);
 bool passwordsExist = false; //is true if a passwords.txt file already exists
 std::map<std::string, std::string> passes; //map with username as key, password as value
 std::map<std::string, int> clients; //map with username and sockets
+
+void privateMessage(int sock);
+void broadcastMessage(int sock);
+void clientExit(int sock);
  
 int main(int argc , char *argv[])
 {   
@@ -196,14 +200,15 @@ void *connection_handler(void *socket_desc)
     //Receive a message from client
     while( (read_size = recv(sock , client_message , sizeof(client_message) , 0)) > 0 )
     {
-        //end of string marker
-        client_message[read_size] = '\0';
-        
-        //Send the message back to client
-        write(sock , client_message , strlen(client_message));
-        
-        //clear the message buffer
-        memset(client_message, 0, 2000);
+        std::string mes = client_message;
+        std::cout<<"*"<<mes<<"*\n";
+        if (mes.compare("CP") == 0)
+            privateMessage(sock);
+        else if (mes.compare("CB") == 0)
+            broadcastMessage(sock);
+        else if (mes.compare("E") == 0)
+            clientExit(sock);
+
     }
      
     if(read_size == 0)
@@ -220,10 +225,10 @@ void *connection_handler(void *socket_desc)
     return 0;
 } 
 
-void privateMessage(int sock, std::map<std::string, int> users) {
+void privateMessage(int sock) {
     // Create list of users as a string
     std::string users_str = "Online Users:";
-    for (auto it = users.cbegin(); it != users.cend(); ++it) {
+    for (auto it = clients.begin(); it != clients.end(); ++it) {
         users_str += " -> " + it->first + "\n";
     } 
 
@@ -244,11 +249,20 @@ void privateMessage(int sock, std::map<std::string, int> users) {
 
 void broadcastMessage(int sock) {
     // Send acknowledgement to server
-    
+    std::string conf = "CONF";
+    write(sock, conf.c_str(), strlen(conf.c_str()));
+    char buffer[BUFSIZ];
     // Receive Message, add formatting
-    
+    if (recv(sock , buffer , sizeof(buffer) , 0) <= 0){
+        perror("Error receiving message from client\n");
+        exit(1);
+    }
     // Send message to all users
-
+    std::string bufferTemp = buffer;
+    std::string message = "#### New Message: " + bufferTemp + " ####";
+    for (auto it = clients.begin(); it!= clients.end(); ++it){
+        write(it->second, message.c_str(), strlen(message.c_str()));   
+    }
 }
 
 void clientExit(int sock, std::string username) {
