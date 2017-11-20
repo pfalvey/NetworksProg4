@@ -199,10 +199,9 @@ void *handle_messages(void *socket_desc) {
     repo << temp1;
     repo >> temp2;
     repo >> temp3;
-    repo >> temp1 >> temp1;
       if (strcmp(buf, "CONF") != 0){  
         std::cout << std::endl << std::endl << buf <<std::endl;
-        if (temp2.compare("Online") != 0 && temp1.compare("from") != 0 && temp3.compare("Sent.") != 0)
+        if (temp2.compare("Online") != 0 && temp3.compare("Sent.") != 0)
             std::cout << "\nEnter P for private conversation\nEnter B for message broadcasting\nEnter E for Exit\n\n  >> ";
         fflush(stdout);
       }
