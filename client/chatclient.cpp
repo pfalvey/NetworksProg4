@@ -24,8 +24,10 @@
 #include <sstream>
 
 //the thread function
-void *connection_handler(void *);
+void *handle_messages(void*);
+void check_password(void *);
 char *username;
+int quit = 0;  //set this to 1 when exiting to wrap up threads
 
 int main(int argc , char *argv[])
 {
@@ -78,19 +80,30 @@ int main(int argc , char *argv[])
       close(s); exit(1);
     }
 
-    pthread_t thread_id;
+    pthread_t handler_thread;
+    //thread for receiving incoming messages
     
-    puts("Connected to server\n"); 
+    puts("Connected to server\n");
+    //connection to server established, handle username/password
+    check_password(&s);
          
-    if( pthread_create( &thread_id , NULL ,  connection_handler , (void*) &s) < 0)
+    if( pthread_create( &handler_thread , NULL , handle_messages , (void*) &s) < 0)
     {
         perror("could not create thread");
         return 1;
     }
+
+
+    bzero(buf, sizeof(buf));
+    //read stdin and send to server
+    while(fgets(buf, sizeof(buf), stdin))
+    {
+      write(s, buf, strlen(buf));
+    }
      
     //Now join the thread , so that we dont terminate before the thread
-    pthread_join( thread_id , NULL);
-    puts("Handler assigned");
+    //pthread_join( handler_thread , NULL);
+    //puts("Handler assigned");
      
     if (s < 0)
     {
@@ -100,17 +113,14 @@ int main(int argc , char *argv[])
      
     return 0;
 }
- 
-/*
- * This will handle connection for each client
- * */
-void *connection_handler(void *socket_desc)
+
+void check_password(void *socket_desc)
 {
     //Get the socket descriptor
     int sock = *(int*)socket_desc;
     int read_size;
      
-    //Send some messages to the client
+    //Send username to server
     char buf[BUFSIZ];
     strcpy(buf, username);
     if (write(sock, buf, strlen(buf)) == -1){
@@ -160,7 +170,35 @@ void *connection_handler(void *socket_desc)
         check = "";
         repoTemp >> check;
     }
-    //Receive a message from client
+}
+
+    
+void *handle_messages(void *socket_desc) {
+    //Receive a message from server
+    //put it onto queue for parsing
+  char buf[BUFSIZ];
+  int sock = *(int*)socket_desc;
+  int read_size;
+
+  while(1)
+  {
+      if(quit)
+      {
+	  break;
+      }
+  
+
+      if(read_size = recv(sock, buf, sizeof(buf), 0) <= 0)
+	{
+	  perror("Error receiving message from server\n");
+	  exit(1);
+	}
+
+      std::cout << buf << std::endl;
+      //for now we just print the message, later we may have to parse it
+  }
+  
+/*
     while( fgets(buf, sizeof(buf), stdin))
     {
         buf[strlen(buf)] = '\0';
@@ -189,4 +227,5 @@ void *connection_handler(void *socket_desc)
     }
          
     return 0;
+  */
 } 
