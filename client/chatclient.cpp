@@ -196,14 +196,17 @@ void *handle_messages(void *socket_desc) {
 	  exit(1);
 	}
     std::stringstream repo;
-    std::string temp1, temp2, temp3;
+    std::string temp1, temp2, temp3, temp4, temp6;
     temp1 = buf;
     repo << temp1;
     repo >> temp2;
     repo >> temp3;
+    repo >> temp4 >> temp4 >> temp4;
+    temp6 = username;
+    std::string temp5 = temp6 + ":";
       if (strcmp(buf, "CONF") != 0){  
         std::cout << std::endl << std::endl << buf <<std::endl;
-        if (temp2.compare("Online") != 0 && temp3.compare("Sent.") != 0 && temp2.compare("User") != 0)
+        if (temp2.compare("Online") != 0 && temp3.compare("Sent.") != 0 && temp2.compare("User") != 0 && temp4.compare(temp5) != 0)
             std::cout << "\nEnter P for private conversation\nEnter B for message broadcasting\nEnter E for Exit\n\n  >> ";
         fflush(stdout);
       }
