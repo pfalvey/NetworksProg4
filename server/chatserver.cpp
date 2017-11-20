@@ -120,13 +120,68 @@ void *connection_handler(void *socket_desc)
     int sock = *(int*)socket_desc;
     int read_size;
     char client_message[BUFSIZ];
-     
+    char buf[BUFSIZ];
+    if (recv(sock, buf, sizeof(buf), 0) == -1){
+        perror("error retrieving username from client\n");
+    } 
+    std::string tempUsername = buf;
+    //tempUsername.pop_back();
+    bool existingUser = false;
+    for (auto it=passes.begin(); it!=passes.end(); ++it){
+        if (tempUsername.compare(it->first) == 0){
+            existingUser = true;
+            std::string returnMessage = "Welcome back! Enter password >> ";
+            write(sock, returnMessage.c_str(), strlen(returnMessage.c_str()));
+            memset(buf, 0, BUFSIZ);
+            /*retrieve password from user*/
+            bool gotPass = false;
+            while (!gotPass){
+                if (recv(sock, buf, sizeof(buf), 0) == -1){
+                    perror("error retrieving username from client\n");
+                }
+                std::string tempPass = buf;
+                tempPass.pop_back();
+                if (tempPass.compare(it->second) == 0){
+                    gotPass = true;
+                    continue;
+                } 
+                else {
+                    returnMessage = "Wrong password. Please re-enter >> ";
+                    write(sock, returnMessage.c_str(), strlen(returnMessage.c_str()));
+                    memset(buf, 0, BUFSIZ);
+                }
+            }
+        }
+    }
+    if (!existingUser){
+        std::string returnMessage = "New user? Create password >> ";
+        write(sock, returnMessage.c_str(), strlen(returnMessage.c_str()));
+        memset(buf, 0, BUFSIZ);
+        if (recv(sock, buf, sizeof(buf), 0) == -1){
+            perror("error retrieving username from client\n");
+        }
+        std::string tempPass = buf;
+
+        /* write new password to file */
+        if (passwordsExist){
+            std::ofstream ofs("passwords.txt", std::ofstream::app);
+            ofs << tempUsername << " " << tempPass;
+            ofs.close();
+        }
+        else { //create new file
+            std::fstream outfile;
+            outfile.open("passwords.txt", std::fstream::in | std::fstream::out | std::fstream::app);
+            outfile << tempUsername << " " << tempPass;
+            outfile.close();
+        }
+        tempPass.pop_back();
+        passes.insert(std::pair<std::string, std::string>(tempUsername, tempPass));
+        
+    }
     //Send some messages to the client
-    char message[BUFSIZ] = "Greetings! I am your connection handler\n";
-    write(sock , message , strlen(message));
+    std::string welcomeMessage = "Welcome " + tempUsername + "!\n";
+    write(sock , welcomeMessage.c_str() , strlen(welcomeMessage.c_str()));
      
-    sprintf(message,"Now type something and i shall repeat what you type \n");
-    write(sock , message , strlen(message));
      
     //Receive a message from client
     while( (read_size = recv(sock , client_message , sizeof(client_message) , 0)) > 0 )
