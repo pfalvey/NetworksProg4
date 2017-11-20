@@ -193,10 +193,17 @@ void *handle_messages(void *socket_desc) {
 	  perror("Error receiving message from server\n");
 	  exit(1);
 	}
-
+    std::stringstream repo;
+    std::string temp1, temp2, temp3;
+    temp1 = buf;
+    repo << temp1;
+    repo >> temp2;
+    repo >> temp3;
+    repo >> temp1 >> temp1;
       if (strcmp(buf, "CONF") != 0){  
         std::cout << std::endl << std::endl << buf <<std::endl;
-        std::cout << "\nEnter P for private conversation\nEnter B for message broadcasting\nEnter E for Exit\n\n  >> ";
+        if (temp2.compare("Online") != 0 && temp1.compare("from") != 0 && temp3.compare("Sent.") != 0)
+            std::cout << "\nEnter P for private conversation\nEnter B for message broadcasting\nEnter E for Exit\n\n  >> ";
         fflush(stdout);
       }
       //for now we just print the message, later we may have to parse it
@@ -243,20 +250,17 @@ void privateMessage(int sock) {
     std::cin >> username;
  
     // get username
-    std::string username_msg = "C";
-    username_msg += username;
 
     // get message
     std::string message;
     std::cout << "Enter Private Message >> ";
     getline(std::cin.ignore(), message);
-    std::string send_msg = "C" + message;
 
     // send username
-    write(sock, username_msg.c_str(), strlen(username_msg.c_str()));
+    write(sock, username.c_str(), strlen(username.c_str()));
 
     // send message
-    write(sock, send_msg.c_str(), strlen(send_msg.c_str()));
+    write(sock, message.c_str(), strlen(message.c_str()));
     sleep(1);
 }
 
