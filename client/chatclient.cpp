@@ -21,10 +21,12 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <sstream>
 
 //the thread function
 void *connection_handler(void *);
- 
+char *username;
+
 int main(int argc , char *argv[])
 {
     int SERVER_PORT;
@@ -32,7 +34,7 @@ int main(int argc , char *argv[])
     struct hostent *hp;
     struct sockaddr_in sin;
     char *host;
-    char *username;
+
     char buf[BUFSIZ];
     int s;
     int len;
@@ -45,7 +47,7 @@ int main(int argc , char *argv[])
     }
     else 
     {
-        fprintf(stderr, "usage: ./myftp [SERVER NAME] [PORT]\n");
+        fprintf(stderr, "usage: ./chatclient [SERVER NAME] [PORT] [USERNAME]\n");
         exit(1);
     }
 
@@ -109,23 +111,55 @@ void *connection_handler(void *socket_desc)
     int read_size;
      
     //Send some messages to the client
-    char buf[BUFSIZ];;
-     
-     
-    if (read_size = recv(sock , buf, sizeof(buf) , 0) == -1){
-        perror("Error receiving message from server\n");
+    char buf[BUFSIZ];
+    strcpy(buf, username);
+    if (write(sock, buf, strlen(buf)) == -1){
+        perror("Error sending username to server\n");
         exit(1);
-
-    }
-    std::cout<<buf<<std::endl;
+    } 
     memset(buf, 0, sizeof(buf));
     if (read_size = recv(sock , buf, sizeof(buf) , 0) == -1){
         perror("Error receiving message from server\n");
         exit(1);
 
     }
-    std::cout<<buf<<std::endl;
+    std::cout<<buf;
     memset(buf, 0, sizeof(buf));
+    /* send password */
+    fgets(buf, sizeof(buf), stdin);
+    if (write(sock, buf, strlen(buf)) == -1){
+        perror("Error sending password to server\n");
+        exit(1);
+    } 
+    memset(buf, 0, sizeof(buf));
+    if (read_size = recv(sock , buf, sizeof(buf) , 0) == -1){
+        perror("Error receiving message from server\n");
+        exit(1);
+
+    }
+    std::cout<<buf;
+    std::string response = buf;
+    memset(buf, 0, sizeof(buf));
+    std::stringstream repo;
+    repo << response;
+    std::string check;
+    repo >> check;
+    while (check.compare("Welcome") != 0){ //wrong password
+        fgets(buf, sizeof(buf), stdin);
+        if (write(sock, buf, strlen(buf)) == -1){
+            perror("Error sending username to server\n");
+            exit(1);
+        } 
+        memset(buf, 0, sizeof(buf));
+        if (read_size = recv(sock , buf, sizeof(buf) , 0) == -1){
+            perror("Error receiving message from server\n");
+            exit(1);
+        }
+        std::cout<<buf;
+        std::stringstream repoTemp;
+        check = "";
+        repoTemp >> check;
+    }
     //Receive a message from client
     while( fgets(buf, sizeof(buf), stdin))
     {
