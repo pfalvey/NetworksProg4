@@ -19,7 +19,7 @@
 
 void privateMessage(int);
 void broadcastMessage(int);
-void clientExit(int, std::string);
+void clientExit(int, std::string username);
  
 //the thread function
 void *connection_handler(void *);
@@ -29,7 +29,7 @@ std::map<std::string, int> clients; //map with username and sockets
 
 void privateMessage(int sock);
 void broadcastMessage(int sock);
-void clientExit(int sock);
+void clientExit(int sock, std::string);
  
 int main(int argc , char *argv[])
 {   
@@ -206,7 +206,7 @@ void *connection_handler(void *socket_desc)
         else if (mes.compare("CB") == 0)
             broadcastMessage(sock);
         else if (mes.compare("E") == 0)
-            clientExit(sock);
+            clientExit(sock, tempUsername);
 
     }
      
