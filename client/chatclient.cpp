@@ -26,7 +26,8 @@
 void commandMenu(int);
 void privateMessage(int);
 void broadcastMessage(int);
-void printMessage(char*);
+void clientExit(int);
+void printMessage(char *);
 
 //the thread function
 void *handle_messages(void*);
@@ -191,8 +192,14 @@ void *handle_messages(void *socket_desc) {
 	  exit(1);
 	}
 
-	printMessage(buf);
-    }
+      if (strcmp(buf, "CONF") != 0){  
+        std::cout << std::endl << buf <<"\n\n  >> ";
+        fflush(stdout);
+      }
+      //for now we just print the message, later we may have to parse it
+      memset(buf, 0, sizeof(buf));
+  }
+  
   
 } 
 
@@ -203,19 +210,19 @@ void commandMenu(int sock) {
     std::cin >> command;
 
     // Enter Operation Function
-    while (1) {
+    while (command.compare("E") != 0) {
         if (command.compare("P") == 0) {
             privateMessage(sock);
-            break;
         } else if (command.compare("B") == 0) {
             broadcastMessage(sock);
-            break;
         } else if (command.compare("E") == 0) {
-	    quit = 1;
-	    break;
+            clientExit(sock);
+            return;
         } else {
             std::cout << "Please enter one of the options\n";
         }
+        std::cout << "Enter P for private conversation\nEnter B for message broadcasting\nEnter E for Exit\n\n  >> ";
+        std::cin >> command;
     }
 
 }
@@ -228,12 +235,12 @@ void privateMessage(int sock) {
     write(sock, operation, strlen(operation));
 
     // Print online users (sent by server) and get username from user
-    char server_message[BUFSIZ];
+    /*char server_message[BUFSIZ];
     memset(server_message, 0, sizeof(server_message));
     int read_size = recv(sock, server_message, sizeof(server_message), 0);
     server_message[read_size] = '\0';
 
-    printMessage(server_message);
+    printMessage(server_message);*/
     char username[BUFSIZ];
     memset(username, 0, sizeof(username));
     std::cout << "Enter Username >> ";
@@ -254,13 +261,13 @@ void privateMessage(int sock) {
     write(sock, username_msg, strlen(username_msg));
 
     // Server tells us if user exists or not
-    memset(server_message, 0, sizeof(server_message));
+    /*memset(server_message, 0, sizeof(server_message));
     read_size = recv(sock, server_message, sizeof(server_message), 0);
     server_message[read_size] = '\0';
     if (strcmp(server_message, "CY") != 0) {  // exit function if user does not exist
         std::cout << "Username not found!\n\n";
         return;
-    }
+    }*/
 
     // Send message to server
     char message[BUFSIZ];
@@ -284,16 +291,28 @@ void privateMessage(int sock) {
 
 void broadcastMessage(int sock) {
     // Send operation to server
-    char operation[BUFSIZ];
-    sprintf(operation, "BP");
-    write(sock, operation, strlen(operation));
+    char buf[BUFSIZ];
+    memset(buf, 0, sizeof(buf));
+    sprintf(buf, "CB");
+    write(sock, buf, strlen(buf));
 
-    // Receive Acknowledgement from server
-    
     // Ask user for message
-    
+    std::cout << "Enter Broadcast Message >> ";
+    std::string msg;
+    getline(std::cin.ignore(), msg);
     // Send message
+    memset(buf, 0, sizeof(buf));
+    strcpy(buf, msg.c_str());
+    write(sock, buf, strlen(buf));
 
+}
+
+void clientExit(int sock) {
+    // send operation to server
+    char buf[BUFSIZ];
+    memset(buf, 0, sizeof(buf));
+    sprintf(buf, "CE");
+    quit = 1;
 }
 
 void printMessage(char * msg) {
