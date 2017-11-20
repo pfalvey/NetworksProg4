@@ -102,10 +102,11 @@ int main(int argc , char *argv[])
 
     bzero(buf, sizeof(buf));
     //read stdin and send to server
-    while(fgets(buf, sizeof(buf), stdin))
+    commandMenu(s);
+    /*while(fgets(buf, sizeof(buf), stdin))
     {
       write(s, buf, strlen(buf));
-    }
+    }*/
      
     //Now join the thread , so that we dont terminate before the thread
     //pthread_join( handler_thread , NULL);
@@ -199,9 +200,10 @@ void *handle_messages(void *socket_desc) {
 	  perror("Error receiving message from server\n");
 	  exit(1);
 	}
-
-      std::cout << buf << std::endl;
+      if (strcmp(buf, "CONF") != 0)  
+        std::cout << std::endl << buf << std::endl;
       //for now we just print the message, later we may have to parse it
+      memset(buf, 0, sizeof(buf));
   }
   
 /*
@@ -243,19 +245,19 @@ void commandMenu(int sock) {
     std::cin >> command;
 
     // Enter Operation Function
-    while (1) {
+    while (command.compare("E") != 0) {
         if (command.compare("P") == 0) {
             privateMessage(sock);
-            break;
         } else if (command.compare("B") == 0) {
             broadcastMessage(sock);
-            break;
         } else if (command.compare("E") == 0) {
             clientExit(sock);
             return;
         } else {
             std::cout << "Please enter one of the options\n";
         }
+        std::cout << "Enter P for private conversation\nEnter B for message broadcasting\nEnter E for Exit\n\n  >> ";
+        std::cin >> command;
     }
 
 }
@@ -332,12 +334,12 @@ void broadcastMessage(int sock) {
     // Ask user for message
     std::cout << "Enter Broadcast Message >> ";
     std::string msg;
-    std::cin >> msg;    
-
+    getline(std::cin.ignore(), msg);
     // Send message
     memset(buf, 0, sizeof(buf));
     strcpy(buf, msg.c_str());
     write(sock, buf, strlen(buf));
+
 }
 
 void clientExit(int sock) {
