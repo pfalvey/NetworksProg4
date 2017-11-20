@@ -1,14 +1,29 @@
 # NetworksProg4
-https://www3.nd.edu/~dwang5/courses/fall17/programming/prog4.html
 
-Patrick:
-need to keep track of users and passwords in server. store in file in server. When server starts read this file and use a map. When client starts, have it send user name to server and have server request password.
+Patrick Falvey, Matt Flanagan, Michael Farren
 
-Mikey:
-define protocol: P for private, B for broadcast, E for exit.
-have client send P B or E. Server prompts user for message or username if it is private message.
+Files:
+======
+chatclient				Executable for the client program
+chatclient.cpp				C++ code that runs the client
+Makefile (client directory)		Makefile to compile the chatclient.cpp code
+README.md				This document listing the files included in our assignment
+chatserver				Executable for the server program
+chatserver.cpp				C++ code that runs the server
+Makefile (server directory)		Makefile to compile the chatserver.cpp code
+passwords.txt				Text file of returning users and their passwords
 
-Matt:
-extend multithreading so server can keep track of all the clients.
-add another thread to client to receive the messages. 
-(and then help out mikey and pat)
+
+Example Commands:
+=================
+
+1) Must Start With Server (from student00)
+
+$ ./chatserver 41039
+
+2) Run clients to connect to the server from different machines
+
+$ ./chatclient student00.cse.nd.edu 41039 patrick
+$ ./chatclient student00.cse.nd.edu 41039 mikey
+$ ./chatclient student00.cse.nd.edu 41039 matt
+
