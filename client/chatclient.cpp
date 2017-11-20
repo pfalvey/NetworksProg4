@@ -258,20 +258,66 @@ void commandMenu(int sock) {
 
 }
 
+
 void privateMessage(int sock) {
     // Send operation to server
     char operation[BUFSIZ];
     sprintf(operation, "CP");
     write(sock, operation, strlen(operation));
 
-    // Server sends online users
+    // Print online users (sent by server) and get username from user
+    char server_message[BUFSIZ];
+    memset(server_message, 0, sizeof(server_message));
+    int read_size = recv(sock, server_message, sizeof(server_message), 0);
+    server_message[read_size] = '\0';
+
+    printMessage(server_message);
+    char username[BUFSIZ];
+    memset(username, 0, sizeof(username));
+    std::cout << "Enter Username >> ";
+    fgets(username, sizeof(username), stdin);
 
     // Send username
-    
-    // Server tells us if user exists or not
-    
-    // Send message to server
+    char username_msg[BUFSIZ];
+    memset(username_msg, 0, sizeof(username_msg));
+    username_msg[0] = 'C';
+    for (int c = 0 ; c < strlen(username); c++) {
+        if (username[c] == '\n') {
+            username_msg[c+1] = '\0';
+            break;
+        } else {
+            username_msg[c+1] = username[c];
+        }
+    }
+    write(sock, username_msg, strlen(username_msg));
 
+    // Server tells us if user exists or not
+    memset(server_message, 0, sizeof(server_message));
+    read_size = recv(sock, server_message, sizeof(server_message), 0);
+    server_message[read_size] = '\0';
+    if (strcmp(server_message, "CY") != 0) {  // exit function if user does not exist
+        std::cout << "Username not found!\n\n";
+        return;
+    }
+
+    // Send message to server
+    char message[BUFSIZ];
+    memset(message, 0, sizeof(message));
+    std::cout << "Enter Private Message >> ";
+    fgets(message, sizeof(message), stdin);
+
+    char send_msg[BUFSIZ];
+    send_msg[0] = 'C';
+    for (int c = 0 ; c < strlen(message); c++) {
+        if (message[c] == '\n') {
+            send_msg[c+1] = '\0';
+            break;
+        } else {
+            send_msg[c+1] = message[c];
+        }
+    }
+    write(sock, send_msg, strlen(send_msg));
+    std::cout << "Message Send.\n";
 }
 
 void broadcastMessage(int sock) {
