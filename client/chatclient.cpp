@@ -99,24 +99,15 @@ int main(int argc , char *argv[])
         return 1;
     }
 
-
     bzero(buf, sizeof(buf));
-    //read stdin and send to server
-    commandMenu(s);
-    /*while(fgets(buf, sizeof(buf), stdin))
+
+    while(!quit)
     {
-      write(s, buf, strlen(buf));
-    }*/
-     
-    //Now join the thread , so that we dont terminate before the thread
-    //pthread_join( handler_thread , NULL);
-    //puts("Handler assigned");
-     
-    if (s < 0)
-    {
-        perror("accept failed");
-        return 1;
+        commandMenu(s);
     }
+    //Now join the thread , so that we dont terminate before the thread
+    pthread_join( handler_thread , NULL);
+    //puts("Handler assigned");
      
     return 0;
 }
@@ -175,76 +166,54 @@ void check_password(void *socket_desc)
         std::cout<<buf;
         std::stringstream repoTemp;
         check = "";
+        repoTemp << buf;
         repoTemp >> check;
+
     }
 }
 
     
 void *handle_messages(void *socket_desc) {
     //Receive a message from server
-    //put it onto queue for parsing
-  char buf[BUFSIZ];
-  int sock = *(int*)socket_desc;
-  int read_size;
+    char buf[BUFSIZ];
+    int sock = *(int*)socket_desc;
+    int r;
 
-  while(1)
-  {
-      if(quit)
-      {
-	  break;
-      }
+    while(1)
+    {
+        if(quit)
+        {
+  	    break;
+        }
   
+	bzero(buf, sizeof(buf));
 
-      if(read_size = recv(sock, buf, sizeof(buf), 0) <= 0)
+	if(r = recv(sock, buf, sizeof(buf), 0) <= 0)
 	{
 	  perror("Error receiving message from server\n");
 	  exit(1);
 	}
-      if (strcmp(buf, "CONF") != 0)  
-        std::cout << std::endl << buf << std::endl;
+
+      if (strcmp(buf, "CONF") != 0){  
+        std::cout << std::endl << std::endl << buf <<std::endl;
+        std::cout << "\nEnter P for private conversation\nEnter B for message broadcasting\nEnter E for Exit\n\n  >> ";
+        fflush(stdout);
+      }
       //for now we just print the message, later we may have to parse it
       memset(buf, 0, sizeof(buf));
   }
   
-/*
-    while( fgets(buf, sizeof(buf), stdin))
-    {
-        buf[strlen(buf)] = '\0';
-        
-        //Send the message to server
-        write(sock , buf , strlen(buf));
-        memset(buf, 0, sizeof(buf));
-        //read message from server
-        if (read_size = recv(sock , buf, sizeof(buf) , 0) == -1){
-            perror("Error receiving message from server\n");
-            exit(1);
-        }
-        std::cout<<buf<<std::endl;
-        //clear the message buffer
-        memset(buf, 0, sizeof(buf));
-    }
-     
-    if(read_size == 0)
-    {
-        puts("Client disconnected");
-        fflush(stdout);
-    }
-    else if(read_size == -1)
-    {
-        perror("recv failed");
-    }
-         
-    return 0;
-  */
+  
 } 
 
 int commandMenu(int sock) {
     // Display Options and Read Input
-    std::cout << "Enter P for private conversation\nEnter B for message broadcasting\nEnter E for Exit\n\n";
+    std::cout << "Enter P for private conversation\nEnter B for message broadcasting\nEnter E for Exit\n\n >> ";
     std::string command;
+    std::cin >> command;
 
     // Enter Operation Function
-    while (command.compare("E") != 0) {
+    while (true) {
         if (command.compare("P") == 0) {
             privateMessage(sock);
         } else if (command.compare("B") == 0) {
@@ -311,10 +280,12 @@ void clientExit(int sock) {
     char buf[BUFSIZ];
     memset(buf, 0, sizeof(buf));
     sprintf(buf, "CE");
+    write (sock, buf, strlen(buf));
+    quit = 1;
 }
 
 void printMessage(char * msg) {
     msg++;
     std::string message = msg;
-    std::cout << msg;
+    std::cout << message;
 }

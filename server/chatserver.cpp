@@ -19,7 +19,7 @@
 
 void privateMessage(int, std::string);
 void broadcastMessage(int);
-void clientExit(std::string);
+void clientExit(int, std::string username);
  
 //the thread function
 void *connection_handler(void *);
@@ -29,7 +29,7 @@ std::map<std::string, int> clients; //map with username and sockets
 
 void privateMessage(int sock);
 void broadcastMessage(int sock);
-void clientExit(int sock);
+void clientExit(int sock, std::string);
  
 int main(int argc , char *argv[])
 {   
@@ -201,14 +201,12 @@ void *connection_handler(void *socket_desc)
     while( (read_size = recv(sock , client_message , sizeof(client_message) , 0)) > 0 )
     {
         std::string mes = client_message;
-        std::cout<<"*"<<mes<<"*\n";
         if (mes.compare("CP") == 0)
             privateMessage(sock, tempUsername);
         else if (mes.compare("CB") == 0)
             broadcastMessage(sock);
-        else if (mes.compare("E") == 0)
-            clientExit(tempUsername);
-
+        else if (mes.compare("CE") == 0)
+            clientExit(sock, tempUsername);
     }
      
     if(read_size == 0)
@@ -282,11 +280,18 @@ void broadcastMessage(int sock) {
     std::string bufferTemp = buffer;
     std::string message = "#### New Message: " + bufferTemp + " ####";
     for (auto it = clients.begin(); it!= clients.end(); ++it){
-        write(it->second, message.c_str(), strlen(message.c_str()));   
+        if (it->second != sock)
+            write(it->second, message.c_str(), strlen(message.c_str()));  
+        else{
+            std::string done = "Message broadcasted.";
+            write(it->second, done.c_str(), strlen(done.c_str()));
+        }
+            
     }
 }
 
-void clientExit(std::string username) {
-    std::cout << "Client disconnected";
+void clientExit(int sock, std::string username) {
+    std::string bye = "CONF";
+    write(sock, bye.c_str(), strlen(bye.c_str()));
     clients.erase(username);
 }
