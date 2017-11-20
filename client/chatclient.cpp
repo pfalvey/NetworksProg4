@@ -26,6 +26,7 @@
 void commandMenu(int);
 void privateMessage(int);
 void broadcastMessage(int);
+void clientExit(int);
 void printMessage(char *);
 
 //the thread function
@@ -250,7 +251,8 @@ void commandMenu(int sock) {
             broadcastMessage(sock);
             break;
         } else if (command.compare("E") == 0) {
-            break;
+            clientExit(sock);
+            return;
         } else {
             std::cout << "Please enter one of the options\n";
         }
@@ -266,12 +268,12 @@ void privateMessage(int sock) {
     write(sock, operation, strlen(operation));
 
     // Print online users (sent by server) and get username from user
-    char server_message[BUFSIZ];
+    /*char server_message[BUFSIZ];
     memset(server_message, 0, sizeof(server_message));
     int read_size = recv(sock, server_message, sizeof(server_message), 0);
     server_message[read_size] = '\0';
 
-    printMessage(server_message);
+    printMessage(server_message);*/
     char username[BUFSIZ];
     memset(username, 0, sizeof(username));
     std::cout << "Enter Username >> ";
@@ -292,13 +294,13 @@ void privateMessage(int sock) {
     write(sock, username_msg, strlen(username_msg));
 
     // Server tells us if user exists or not
-    memset(server_message, 0, sizeof(server_message));
+    /*memset(server_message, 0, sizeof(server_message));
     read_size = recv(sock, server_message, sizeof(server_message), 0);
     server_message[read_size] = '\0';
     if (strcmp(server_message, "CY") != 0) {  // exit function if user does not exist
         std::cout << "Username not found!\n\n";
         return;
-    }
+    }*/
 
     // Send message to server
     char message[BUFSIZ];
@@ -322,16 +324,27 @@ void privateMessage(int sock) {
 
 void broadcastMessage(int sock) {
     // Send operation to server
-    char operation[BUFSIZ];
-    sprintf(operation, "BP");
-    write(sock, operation, strlen(operation));
+    char buf[BUFSIZ];
+    memset(buf, 0, sizeof(buf));
+    sprintf(buf, "CB");
+    write(sock, buf, strlen(buf));
 
-    // Receive Acknowledgement from server
-    
     // Ask user for message
-    
-    // Send message
+    std::cout << "Enter Broadcast Message >> ";
+    std::string msg;
+    std::cin >> msg;    
 
+    // Send message
+    memset(buf, 0, sizeof(buf));
+    strcpy(buf, msg.c_str());
+    write(sock, buf, strlen(buf));
+}
+
+void clientExit(int sock) {
+    // send operation to server
+    char buf[BUFSIZ];
+    memset(buf, 0, sizeof(buf));
+    sprintf(buf, "CE");
 }
 
 void printMessage(char * msg) {

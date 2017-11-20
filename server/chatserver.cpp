@@ -16,6 +16,10 @@
 #include<map>       
 #include<string>
 #include<iostream>
+
+void privateMessage(int);
+void broadcastMessage(int);
+void clientExit(int);
  
 //the thread function
 void *connection_handler(void *);
@@ -228,6 +232,9 @@ void privateMessage(int sock) {
     } 
 
     // Convert string to char* & send to client
+    char users_buf[BUFSIZ];
+    strcpy(users_buf, users_str.c_str());
+    write(sock, users_buf, strlen(users_buf));
 
     // Receive username
     
