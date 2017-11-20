@@ -96,7 +96,7 @@ void *connection_handler(void *socket_desc)
     char message[BUFSIZ] = "Greetings! I am your connection handler\n";
     write(sock , message , strlen(message));
      
-    sprintf(message,"Now type something and i shall repeat what you type \n");
+    sprintf(message,"Enter P for private conversation\nEnter B for message broadcasting\nEnter E for Exit\n");
     write(sock , message , strlen(message));
      
     //Receive a message from client
@@ -104,12 +104,28 @@ void *connection_handler(void *socket_desc)
     {
         //end of string marker
         client_message[read_size] = '\0';
+
+        //Enter message mode
+        if (strcmp(client_message, "P\n") == 0) {
+            privateMessage(sock);
+        } else if (strcmp(client_message, "B\n") == 0) {
+            //std::cout << "chose: B\n";
+        } else if (strcmp(client_message, "E\n") == 0) {
+            //std::cout << "chose: E\n";
+            break;
+        }
         
         //Send the message back to client
         write(sock , client_message , strlen(client_message));
         
         //clear the message buffer
         memset(client_message, 0, 2000);
+
+        //Send menu
+        char menu[BUFSIZ];
+        sprintf(menu,"Enter P for private conversation\nEnter B for message broadcasting\nEnter E for Exit\n");
+        write(sock, menu, strlen(menu));
+        memset(menu, 0, 2000);
     }
      
     if(read_size == 0)
@@ -123,4 +139,6 @@ void *connection_handler(void *socket_desc)
     }
          
     return 0;
-} 
+}
+
+

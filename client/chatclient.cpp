@@ -24,6 +24,7 @@
 
 //the thread function
 void *connection_handler(void *);
+void privateMessage(int);
  
 int main(int argc , char *argv[])
 {
@@ -110,31 +111,58 @@ void *connection_handler(void *socket_desc)
      
     //Send some messages to the client
     char buf[BUFSIZ];;
+    memset(buf, 0, sizeof(buf));
      
-     
+    //receive menu
     if (read_size = recv(sock , buf, sizeof(buf) , 0) == -1){
         perror("Error receiving message from server\n");
         exit(1);
 
     }
-    std::cout<<buf<<std::endl;
+    std::cout<<buf<<std::endl; // "Greetings I am your connection handler"
     memset(buf, 0, sizeof(buf));
     if (read_size = recv(sock , buf, sizeof(buf) , 0) == -1){
         perror("Error receiving message from server\n");
         exit(1);
 
     }
-    std::cout<<buf<<std::endl;
+    std::cout<<buf<<std::endl; // "Enter P for ..." menu
     memset(buf, 0, sizeof(buf));
+
+    std::cout<<">> ";
+
     //Receive a message from client
     while( fgets(buf, sizeof(buf), stdin))
     {
         buf[strlen(buf)] = '\0';
-        
-        //Send the message to server
+
+        std::cout << (int)buf[1] << std::endl;
+
+        //Send Mode to Server
         write(sock , buf , strlen(buf));
+
+        //Enter mode
+        if (strcmp(buf, "P\n") == 0) {
+            privateMessage(sock);
+        } else if (strcmp(buf, "B\n") == 0) {
+            std::cout << "chose: B\n";
+        } else if (strcmp(buf, "E\n") == 0) {
+            std::cout << "chose: E\n";
+            exit(1);
+        } else {
+            std::cout << "Please select P, B, or E\n";
+        }
         memset(buf, 0, sizeof(buf));
-        //read message from server
+
+        //receive message from server
+        if (read_size = recv(sock , buf, sizeof(buf) , 0) == -1){
+            perror("Error receiving message from server\n");
+            exit(1);
+        }
+        std::cout<<buf<<std::endl;
+        memset(buf, 0, sizeof(buf));
+
+        //receive message from server
         if (read_size = recv(sock , buf, sizeof(buf) , 0) == -1){
             perror("Error receiving message from server\n");
             exit(1);
@@ -142,6 +170,7 @@ void *connection_handler(void *socket_desc)
         std::cout<<buf<<std::endl;
         //clear the message buffer
         memset(buf, 0, sizeof(buf));
+        std::cout<<">> ";
     }
      
     if(read_size == 0)
@@ -156,3 +185,9 @@ void *connection_handler(void *socket_desc)
          
     return 0;
 } 
+
+void privateMessage(int sock) {
+    std::cout << "enter privateMessage\n";
+
+    
+}
