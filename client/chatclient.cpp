@@ -200,8 +200,10 @@ void *handle_messages(void *socket_desc) {
 	  perror("Error receiving message from server\n");
 	  exit(1);
 	}
-      if (strcmp(buf, "CONF") != 0)  
-        std::cout << std::endl << buf << std::endl;
+      if (strcmp(buf, "CONF") != 0){  
+        std::cout << std::endl << buf <<"\n\n  >> ";
+        fflush(stdout);
+      }
       //for now we just print the message, later we may have to parse it
       memset(buf, 0, sizeof(buf));
   }
