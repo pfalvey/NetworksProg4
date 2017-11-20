@@ -22,6 +22,8 @@ void *connection_handler(void *);
 bool passwordsExist = false; //is true if a passwords.txt file already exists
 std::map<std::string, std::string> passes; //map with username as key, password as value
 std::map<std::string, int> clients; //map with username and sockets
+int MAX_THREADS = 10;
+
  
 int main(int argc , char *argv[])
 {   
@@ -84,25 +86,31 @@ int main(int argc , char *argv[])
     listen(socket_desc , 3);
      
     //Accept and incoming connection
-    puts("Waiting for incoming connections...");
-    c = sizeof(struct sockaddr_in);
+    //    puts("Waiting for incoming connections...");
+    //c = sizeof(struct sockaddr_in);
      
      
     //Accept and incoming connection
     puts("Waiting for incoming connections...");
     c = sizeof(struct sockaddr_in);
-    pthread_t thread_id;
+    pthread_t threads[MAX_THREADS];
+    int num_threads = 0;
     
     while( (client_sock = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&c)) )
     {
         puts("Connection accepted");
-         
-        if( pthread_create( &thread_id , NULL ,  connection_handler , (void*) &client_sock) < 0)
-        {
-            perror("could not create thread");
-            return 1;
-        }
-         
+        
+	if(num_threads < MAX_THREADS)
+	{
+	  if( pthread_create( &threads[num_threads] , NULL ,  connection_handler , (void*) &client_sock) < 0)
+	    {
+	      perror("could not create thread");
+	      return 1;
+	    }
+	  num_threads++;
+	}
+	//else maybe report to client that there are too many connections?
+
         //Now join the thread , so that we dont terminate before the thread
         //pthread_join( thread_id , NULL);
         puts("Handler assigned");

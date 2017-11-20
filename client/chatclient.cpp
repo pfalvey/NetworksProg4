@@ -189,11 +189,15 @@ void *handle_messages(void *socket_desc) {
   
 
       if(read_size = recv(sock, buf, sizeof(buf), 0) <= 0)
-	{
-	  perror("Error receiving message from server\n");
+      {
+          perror("Error receiving message from server\n");
 	  exit(1);
-	}
+      }
 
+      //ACK and CONF are command messages from server indicating that server has received command or sent message respectively
+      if(buf == "ACK") {}
+      if(buf == "CONF") {}
+      
       std::cout << buf << std::endl;
       //for now we just print the message, later we may have to parse it
   }
