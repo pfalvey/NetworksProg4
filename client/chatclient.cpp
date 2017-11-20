@@ -242,19 +242,22 @@ void privateMessage(int sock) {
     std::string username;
     std::cin >> username;
  
-    // Send username
+    // get username
     std::string username_msg = "C";
     username_msg += username;
-    write(sock, username_msg.c_str(), strlen(username_msg.c_str()));
 
-    // Send message to server
+    // get message
     std::string message;
     std::cout << "Enter Private Message >> ";
     getline(std::cin.ignore(), message);
-
     std::string send_msg = "C" + message;
+
+    // send username
+    write(sock, username_msg.c_str(), strlen(username_msg.c_str()));
+
+    // send message
     write(sock, send_msg.c_str(), strlen(send_msg.c_str()));
-    std::cout << "Message Sent.\n";
+    sleep(1);
 }
 
 void broadcastMessage(int sock) {

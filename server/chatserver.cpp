@@ -251,19 +251,20 @@ void privateMessage(int sock, std::string senderName) {
     if (priv_sock == 0) {
         std::string userErr = "User does not exist\n";
         write(sock, userErr.c_str(), strlen(userErr.c_str()));
-        return;
-    }
-    
-    // Receive message, add formatting, send to user
-    memset(buffer, 0, BUFSIZ);
-    if (recv(sock, buffer, sizeof(buffer), 0) <= 0) {
-        perror("Error receiving message from client\n");
-        exit(1);
-    }
-    std::string bufferTemp = buffer;
-    std::string sendMsg = "#### New Message from " + senderName + ": " + bufferTemp + " ####";
-    write(priv_sock, sendMsg.c_str(), strlen(sendMsg.c_str()));
+    } else {
+        // Receive message, add formatting, send to user
+        memset(buffer, 0, BUFSIZ);
+        if (recv(sock, buffer, sizeof(buffer), 0) <= 0) {
+            perror("Error receiving message from client\n");
+            exit(1);
+        }
+        std::string bufferTemp = buffer;
+        std::string sendMsg = "#### New Message from " + senderName + ": " + bufferTemp + " ####";
+        write(priv_sock, sendMsg.c_str(), strlen(sendMsg.c_str()));
 
+        std::string conf = "Message Sent.\n\n";
+        write(sock, conf.c_str(), strlen(conf.c_str()));
+    }
 }
 
 void broadcastMessage(int sock) {
